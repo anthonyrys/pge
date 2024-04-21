@@ -1,0 +1,72 @@
+from pyeng.utils import scale
+
+import pygame
+import typing
+
+class Sprite(pygame.sprite.Sprite):
+    '''
+    A base class for pygame sprites.
+
+    This should be used as a base class to be inherited from.
+    '''
+
+    def __init__(self, image: str, index: typing.Optional[int] = 0, 
+                 position: typing.Optional[pygame.Vector2] = pygame.Vector2(0, 0),
+                 image_scale: typing.Optional[float] = 1) -> None:
+        '''
+        Creates the sprite object with the given `image` path,
+        it's `image_scale`, rendering `index`, and its starting 
+        `position`.
+        '''
+
+        pygame.sprite.Sprite.__init__(self)
+
+        self.image: pygame.Surface = pygame.image.load(image)
+        self.image = scale(self.image, image_scale)
+
+        self.image.set_colorkey((0, 0, 0))
+
+        self.original_image: typing.Final[pygame.Surface] = self.image.copy()
+
+        self.index: int = index
+
+        self.rect: pygame.FRect = self.image.get_frect(topleft=position)
+        self.original_rect: typing.Final[pygame.FRect] = self.image.get_frect(topleft=position)
+
+    @property
+    def mask(self) -> pygame.Mask:
+        '''
+        Returns a `Mask` object created from the sprite's `image`
+        '''
+
+        return pygame.mask.from_surface(self.image)
+    
+    @property
+    def position(self) -> pygame.Vector2:
+        '''
+        Returns a `pygame.Vector2` object created from the sprite's 
+        topleft position
+        '''
+
+        return getattr(self.rect, 'topleft')
+
+    @property
+    def dimensions(self) -> pygame.Vector2:
+        '''
+        Returns a `pygame.Vector2` object created from the sprite's 
+        `rect` size
+        '''
+
+        return pygame.Vector2(self.rect.size)
+    
+    def update(self, delta_time: float):
+        '''
+        Virtual update function meant to be overridden by subclasses.
+        '''
+        ...
+
+    def render(self, surface: pygame.Surface):
+        '''
+        Virtual render function meant to be overridden by subclasses.
+        '''
+        ...
