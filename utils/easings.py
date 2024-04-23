@@ -1,5 +1,5 @@
-from pyeng.types import Singleton
-from pyeng.utils import Bezier
+from pge.types import Singleton
+from pge.utils import Bezier
 
 import dataclasses
 import typing
@@ -27,7 +27,7 @@ class Easings:
 
         count: typing.Optional[int] = 0
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tasks: list[self.EasingData] = []
 
     def create(self, data: EasingData) -> None:

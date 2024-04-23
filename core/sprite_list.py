@@ -1,4 +1,4 @@
-from pyeng.core import Sprite
+from pge.core import Sprite
 
 import typing
 

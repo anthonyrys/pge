@@ -1,3 +1,6 @@
-import pyeng.types
-import pyeng.utils
-import pyeng.core
+import pge.types
+import pge.utils
+import pge.visual_fx
+import pge.ui
+import pge.mgl
+import pge.core

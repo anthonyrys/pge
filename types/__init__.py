@@ -1,1 +1,1 @@
-from pyeng.types.singleton import Singleton
+from pge.types.singleton import Singleton

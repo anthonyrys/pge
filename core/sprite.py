@@ -1,4 +1,4 @@
-from pyeng.utils import scale
+from pge.utils import scale
 
 import pygame
 import typing
@@ -20,6 +20,7 @@ class Sprite(pygame.sprite.Sprite):
         '''
 
         pygame.sprite.Sprite.__init__(self)
+        self.sprite_id: str = self.__class__.__name__
 
         self.image: pygame.Surface = pygame.image.load(image)
         self.image = scale(self.image, image_scale)
@@ -36,7 +37,7 @@ class Sprite(pygame.sprite.Sprite):
     @property
     def mask(self) -> pygame.Mask:
         '''
-        Returns a `Mask` object created from the sprite's `image`
+        Returns a `Mask` object created from the sprite's `image`.
         '''
 
         return pygame.mask.from_surface(self.image)
@@ -44,28 +45,35 @@ class Sprite(pygame.sprite.Sprite):
     @property
     def position(self) -> pygame.Vector2:
         '''
-        Returns a `pygame.Vector2` object created from the sprite's 
-        topleft position
+        Returns the default position of `get_position`.
         '''
 
-        return getattr(self.rect, 'topleft')
+        return self.get_position()
 
     @property
     def dimensions(self) -> pygame.Vector2:
         '''
         Returns a `pygame.Vector2` object created from the sprite's 
-        `rect` size
+        `rect` size.
         '''
 
         return pygame.Vector2(self.rect.size)
     
-    def update(self, delta_time: float):
+    def get_position(self, point: str = 'topleft') -> pygame.Vector2:
+        '''
+        Returns a `pygame.Vector2` object created from a given `point`
+        on the sprite's rect.
+        '''
+            
+        return pygame.Vector2(getattr(self.rect, point))
+
+    def update(self, delta_time: float) -> None:
         '''
         Virtual update function meant to be overridden by subclasses.
         '''
         ...
 
-    def render(self, surface: pygame.Surface):
+    def render(self, surface: pygame.Surface) -> None:
         '''
         Virtual render function meant to be overridden by subclasses.
         '''

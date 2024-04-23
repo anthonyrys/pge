@@ -22,7 +22,7 @@ class Singleton(typing.Generic[T]):
         On all subsequent calls, the existing instance is returned.
         '''
 
-        if (self._instance == None):
+        if self._instance == None:
             self._instance = self._decorated(*args)
         
         return self._instance

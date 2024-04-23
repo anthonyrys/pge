@@ -1,5 +1,5 @@
-from pyeng.types import Singleton
-from pyeng.utils import load_spritesheet
+from pge.types import Singleton
+from pge.utils import load_spritesheet
 
 import pygame
 import typing
@@ -11,10 +11,10 @@ class Font:
     Singleton class for handling fonts.
     '''
 
-    _FONT_PATH: typing.Final[str] = os.path.join('pyeng', 'data', 'fonts')
+    _FONT_PATH: typing.Final[str] = os.path.join('pge', 'data', 'fonts')
     _FONT_KEYS: typing.Final[tuple[str]] = tuple(map(str, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!?,.;:\'\"/|\_()[]{}<>@#$%+-*=^&')) 
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._fonts: dict[str, typing.Union[int, dict[chr, pygame.Surface]]] = {
             'm3x6': {
                 'spacing': 2,

@@ -1,4 +1,4 @@
-from pyeng.types import Singleton
+from pge.types import Singleton
 
 import dataclasses
 import math
@@ -21,7 +21,7 @@ class Bezier:
         EASE_IN: typing.Final[typing.Sequence[typing.Union[tuple[int, int], int]]] = ([0, 0], [0, 0.09], [0, .95], [1, 0], 0)
 
     @staticmethod
-    def get_bezier_point(t: int, data: typing.Sequence[typing.Union[tuple[int, int], int]]):
+    def get_bezier_point(t: int, data: typing.Sequence[typing.Union[tuple[int, int], int]]) -> float:
         '''
         Returns a position of a bezier point given bezier curve `data` and `t` time.
         '''
