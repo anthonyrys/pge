@@ -11,7 +11,7 @@ class Font:
     Singleton class for handling fonts.
     '''
 
-    _FONT_PATH: typing.Final[str] = os.path.join('pge', 'data', 'fonts')
+    _FONT_PATH: typing.Final[str] = os.path.join('pge', '_data', 'fonts')
     _FONT_KEYS: typing.Final[tuple[str]] = tuple(map(str, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!?,.;:\'\"/|\_()[]{}<>@#$%+-*=^&')) 
 
     def __init__(self) -> None:

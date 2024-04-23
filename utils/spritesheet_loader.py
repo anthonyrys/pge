@@ -3,11 +3,14 @@ import typing
 
 SPRITESHEET_STOP_COLOR: typing.Final[tuple[int, int, int, int]] = (255, 0, 0, 255)
 
-def load_spritesheet(path: str, colorkey: typing.Optional[tuple[int, int, int]] = (0, 0, 0), 
+def load_spritesheet(path: str, frames: typing.Optional[typing.Sequence[int]] = None, 
+                     colorkey: typing.Optional[tuple[int, int, int]] = (0, 0, 0),
                      scale: typing.Optional[float] = 1.0) -> list[pygame.Surface]:
     '''
-    Returns a list of sprites from a given image `path`. Optionally, 
-    can specify a `colorkey` and `scale`.
+    Returns a list of sprites from a given image `path`. 
+    
+    Optionally, can specify a sequence of `frames` for animation,
+    `colorkey` or `scale`.
     '''
 
     images: list[pygame.Surface] = []
@@ -32,9 +35,12 @@ def load_spritesheet(path: str, colorkey: typing.Optional[tuple[int, int, int]] 
 
         if scale != 1.0:
             image = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale)).convert_alpha()
-
         else:
-            images.append(image)
+            if frames:
+                for _ in range(frames[image_count]):
+                    images.append(image)
+            else:
+                images.append(image)
 
         image_count += 1
         start = stop + 1
