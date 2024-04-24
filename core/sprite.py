@@ -10,20 +10,25 @@ class Sprite(pygame.sprite.Sprite):
     This should be used as a base class to be inherited from.
     '''
 
-    def __init__(self, image: str, index: typing.Optional[int] = 0, 
+    def __init__(self, image: typing.Union[pygame.Surface, str], index: typing.Optional[int] = 0, 
                  position: typing.Optional[pygame.Vector2] = pygame.Vector2(0, 0),
                  image_scale: typing.Optional[float] = 1) -> None:
         '''
-        Creates the sprite object with the given `image` path,
-        it's `image_scale`, rendering `index`, and its starting 
-        `position`.
+        Creates the sprite object with the given `image` path or
+        surface.
+        
+        Optionally, a rendering `index`, starting `position` or
+        `image_scale`.
         '''
 
         pygame.sprite.Sprite.__init__(self)
         self.sprite_id: str = self.__class__.__name__
 
-        self.image: pygame.Surface = pygame.image.load(image)
-        self.image = scale(self.image, image_scale)
+        if isinstance(image, pygame.Surface):
+            self.image = image
+        else:
+            self.image: pygame.Surface = pygame.image.load(image)
+            self.image = scale(self.image, image_scale)
 
         self.image.set_colorkey((0, 0, 0))
 
@@ -67,13 +72,13 @@ class Sprite(pygame.sprite.Sprite):
             
         return pygame.Vector2(getattr(self.rect, point))
 
-    def update(self, delta_time: float) -> None:
+    def update(self) -> None:
         '''
         Virtual update function meant to be overridden by subclasses.
         '''
         ...
 
-    def render(self, surface: pygame.Surface) -> None:
+    def render(self) -> None:
         '''
         Virtual render function meant to be overridden by subclasses.
         '''

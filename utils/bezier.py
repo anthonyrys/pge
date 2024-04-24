@@ -24,15 +24,15 @@ class Bezier:
         EASE_IN: BezierInfo = ([0, 0], [0, 0.09], [0, .95], [1, 0], 0)
 
     @staticmethod
-    def get_bezier_point(t: int, data: BezierInfo) -> float:
+    def get_bezier_point(t: float, data: BezierInfo) -> float:
         '''
         Returns a position of a bezier point given bezier curve `data` and `t` time.
         '''
 
-        p_0: tuple[int, int] = data[0]
-        p_1: tuple[int, int] = data[1]
-        p_2: tuple[int, int] = data[2]
-        p_3: tuple[int, int] = data[3]
+        p_0: tuple[float, float] = data[0]
+        p_1: tuple[float, float] = data[1]
+        p_2: tuple[float, float] = data[2]
+        p_3: tuple[float, float] = data[3]
 
         p = [
             math.pow(1 - t, 3) * p_0[0]

@@ -7,6 +7,8 @@ class SpriteList(list):
     A generic helper container for storing sprite objects.
     '''
 
+    SPRITELIST_DELETE: typing.Final[str] = 'sl_00'
+
     def _sort_list(self) -> None:
         '''
         Sort the list based on the sprite's `index` value.
@@ -26,8 +28,16 @@ class SpriteList(list):
         For all sprites in the list, call its `update` function.
         '''
 
+        return_value: typing.Union[None, str] = None
+        del_sprites: list[Sprite] = []
+        
         for __object in self:
-            __object.update()
+            return_value = __object.update()
+            if return_value == self.SPRITELIST_DELETE:
+                del_sprites.append(__object)
+
+        for __object in del_sprites:
+            self.remove(__object)
 
     def render_all(self) -> None:
         '''

@@ -1,5 +1,5 @@
 from pge.types import Singleton
-from pge.utils import Bezier
+from pge.utils import Bezier, BezierInfo
 
 import dataclasses
 import typing
@@ -19,11 +19,10 @@ class Easings:
 
         obj: T
         attribute: str
-
         from_to: tuple[float, float]
 
         to_time: list[int]
-        to_bezier: typing.Optional[str] = Bezier().BezierPresets.EASE_OUT
+        to_bezier: BezierInfo
 
         count: typing.Optional[int] = 0
 
