@@ -4,24 +4,27 @@ import dataclasses
 import math
 import typing
 
+BezierInfo = typing.NewType('BezierInfo', typing.Sequence[typing.Union[tuple[int, int], int]])
+
 @Singleton
 class Bezier:
     '''
-    Utility class for bezier operations
+    Utility class for bezier operations.
     '''
 
     @dataclasses.dataclass
     class BezierPresets:
         '''
-        Data class for Bezier presets
+        Data class for Bezier presets.
         '''
 
-        SINE: typing.Final[typing.Sequence[typing.Union[tuple[int, int], int]]] = ([0, 0], [0, 1], [1, 1], [1, 0], 0)
-        EASE_OUT: typing.Final[typing.Sequence[typing.Union[tuple[int, int], int]]] = ([0, 0], [1, 0.09], [1, .95], [1, 0], 0)
-        EASE_IN: typing.Final[typing.Sequence[typing.Union[tuple[int, int], int]]] = ([0, 0], [0, 0.09], [0, .95], [1, 0], 0)
+        SINE: BezierInfo = ([0, 0], [0, 1], [1, 1], [1, 0], 0)
+
+        EASE_OUT: BezierInfo = ([0, 0], [1, 0.09], [1, .95], [1, 0], 0)
+        EASE_IN: BezierInfo = ([0, 0], [0, 0.09], [0, .95], [1, 0], 0)
 
     @staticmethod
-    def get_bezier_point(t: int, data: typing.Sequence[typing.Union[tuple[int, int], int]]) -> float:
+    def get_bezier_point(t: int, data: BezierInfo) -> float:
         '''
         Returns a position of a bezier point given bezier curve `data` and `t` time.
         '''

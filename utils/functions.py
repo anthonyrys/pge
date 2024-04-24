@@ -23,7 +23,11 @@ def generate_import_dict(*excludes: typing.Sequence[T]) -> dict[str, T]:
 
 def scale(image, sx: float, sy: typing.Optional[float] = None) -> pygame.Surface:
     '''
-    Simplified pygame scale function
+    Simplified pygame scale function.
+
+    Returns the image scaled by `sx` on both axes.
+    
+    Optionally, `sx` on the x-axis, and `sy` on the y-axis.
     '''
         
     if not sy: sy = sx
@@ -32,14 +36,14 @@ def scale(image, sx: float, sy: typing.Optional[float] = None) -> pygame.Surface
 
 def clamp(v: float, mi: float, mx: float) -> float:
     '''
-    Returns value `v` clamped between `mi` and `mx`
+    Returns value `v` clamped between `mi` and `mx`.
     '''
 
     return max(mi, min(v, mx))
 
 def get_distance(p1: tuple[float, float], p2: tuple[float, float]) -> float:
     '''
-    Returns the distance between point `p1` and point `p2`
+    Returns the distance between point `p1` and point `p2`.
     '''
 
     rx: float = abs(p1[0] - p2[0])
