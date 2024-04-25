@@ -1,4 +1,5 @@
 from pge.types import Singleton
+from pge.core import Input
 from pge.core import Font
 from pge.core import Sound
 
@@ -52,7 +53,8 @@ class Core:
         self.frame_count: float = 0
 
         self.events: list[pygame.Event] = None
-
+        
+        self.input_service: Input = Input()
         self.font_service: Font = Font()
         self.sound_service: Sound = Sound()
         
@@ -75,10 +77,8 @@ class Core:
 
         while not self.quit:
             self.events = pygame.event.get()
-            for event in self.events:
-                if event.type == pygame.QUIT:
-                    self.quit = True
-
+            self.quit = self.input_service._run(self.events)
+            
             self.delta_time = (time.time() - self.last_time) * self.frame_rate
             self.last_time = time.time()
 
