@@ -1,7 +1,10 @@
 from pge.types import Singleton
+
 from pge.core import Input
 from pge.core import Font
 from pge.core import Sound
+
+from pge.network import Client
 
 import pygame
 import typing
@@ -89,3 +92,6 @@ class Core:
 
             pygame.display.flip()
             self.clock.tick(self.frame_rate)
+
+        if Client.instanced:
+            Client().kill()

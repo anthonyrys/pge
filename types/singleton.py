@@ -26,3 +26,11 @@ class Singleton(typing.Generic[T]):
             self._instance = self._decorated(*args)
         
         return self._instance
+
+    @property
+    def instanced(self) -> bool:
+        '''
+        Returns whether the decorated class has been instantiated.
+        '''
+
+        return self._instance is not None
