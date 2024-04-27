@@ -36,8 +36,6 @@ class Client:
 
         self._running: bool = True
 
-        self._socket.sendto(pickle.dumps('CONNECTING'), (self._ip, self._port))
-
         thread_send: threading.Thread = threading.Thread(target=self._run_s)
         thread_recv: threading.Thread = threading.Thread(target=self._run_r)
 
@@ -55,14 +53,20 @@ class Client:
         '''
         Thread which handles the `Client` package sending.
 
+        The `Client` will continuosly send 'CONNECTING' to
+        the server until it receives a packet back.
+
         If `send_packet` is not `None`, it will be sent to
         the server.
         '''
 
         while self._running:
             time.sleep(self.SLEEP_TIME)
+
+            if not self.recv_packet:
+                self._socket.sendto(pickle.dumps('CONNECTING'), (self._ip, self._port))
             
-            if self.send_packet:
+            elif self.send_packet:
                 data: bytes = pickle.dumps(self.send_packet)
                 self._socket.sendto(data, (self._ip, self._port))
 

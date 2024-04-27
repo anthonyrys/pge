@@ -38,11 +38,17 @@ class Input:
         for func, info in funcs.items():
             if isinstance(info[1], typing.Sequence):
                 if key in info[1]:
-                    func(*info[0], key)
+                    try:
+                        func(*info[0], key)
+                    except TypeError:
+                        func(*info[0])    
         
             elif not info[1] or info[1] == key:
-                func(*info[0], key)
-        
+                try:
+                    func(*info[0], key)
+                except TypeError:
+                    func(*info[0])    
+
         self._itering = False
 
         for key_type, funcs in self._del_funcs.items():

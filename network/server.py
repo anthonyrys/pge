@@ -12,7 +12,7 @@ class Server:
     Server singleton for the network socket.
     '''
         
-    def __init__(self, ip: str, port: int, ticks: typing.Optional[int] = 120) -> None:
+    def __init__(self, ip: str, port: int, tick_rate: typing.Optional[int] = 120) -> None:
         '''
         Creates the `Server` instance.
 
@@ -22,9 +22,9 @@ class Server:
         '''
 
         self.BUFFER_SIZE: int = 1048
-        self.SLEEP_TIME: float = 1 / ticks
+        self.SLEEP_TIME: float = 1 / tick_rate
 
-        self.ticks: int = ticks
+        self.tick_rate: int = tick_rate
 
         self._ip: str = ip
         self._port: int = port
@@ -40,6 +40,9 @@ class Server:
 
         self._func_s: tuple[callable, typing.Sequence[any]] = None
         self._func_r: tuple[callable, typing.Sequence[any]] = None
+
+        self._func_c: tuple[callable, typing.Sequence[any]] = None
+        self._func_d: tuple[callable, typing.Sequence[any]] = None
 
         thread_send: threading.Thread = threading.Thread(target=self._run_s)
         thread_recv: threading.Thread = threading.Thread(target=self._run_r)
@@ -69,20 +72,46 @@ class Server:
 
         self._func_r = (func, args)
 
+    def set_connected(self, func: callable, *args: typing.Sequence[any]) -> None:
+        '''
+        Set the `func` that will be called with it's `args`
+        when a new client is connected to the server.
+
+        `func` will also be called with the client as an 
+        argument.
+        '''
+
+        self._func_c = (func, args)
+
+    def set_disconnected(self, func: callable, *args: typing.Sequence[any]) -> None:
+        '''
+        Set the `func` that will be called with it's `args`
+        when a client has been disconnected from the server.
+
+        `func` will also be called with the client as an 
+        argument.
+        '''
+
+        self._func_d = (func, args)
+
     def unset(self, func_type: str) -> None:
         '''
         Removes a function set by either `set_send` or `set_received`.
 
         An assertion error will be raised if `func_type` is not
-        `s` or `r`.
+        `s`, `r`, `c`, or `d`.
         '''
 
-        assert func_type == 's' or func_type == 'r'
+        assert func_type in ('s', 'r', 'c', 'd')
 
         if func_type == 's':
             self._func_s = None
         elif func_type == 'r':
             self._func_r = None
+        elif func_type == 'c':
+            self._func_c = None
+        elif func_type == 'd':
+            self._func_d = None
 
     def kill(self) -> None:
         '''
@@ -96,8 +125,11 @@ class Server:
         Thread which handles the `Server` package sending and
         client inactivity.
 
-        If a client has not sent a package in `self.ticks * 5`,
-        it will be removed from `clients`.
+        If a client has not sent a package in `self.tick_rate * 5`,
+        it will be removed from `clients`. 
+        
+        The function set with `set_disconnected` will be called, 
+        with the client as an argument.
 
         Sends a package specified by the function set with 
         `set_send` to each client in `clients`.
@@ -109,12 +141,15 @@ class Server:
             del_clients: list[tuple[str, int]] = []
             for client in self.clients:
                 self._clients_timer[client] += 1
-                if self._clients_timer[client] >= self.ticks * 5:
+                if self._clients_timer[client] >= self.tick_rate * 5:
                     del_clients.append(client)
 
             for client in del_clients:
                 del self._clients_timer[client]
                 self.clients.remove(client)
+
+                if self._func_d:
+                    self._func_d[0](*self._func_d[1], client)
 
             if not self._func_s:
                 continue
@@ -132,15 +167,22 @@ class Server:
 
         The function set with `set_received` will be called with
         the received packet as an argument.
+
+        If a new client has been detected, the function set with
+        `set_connected` will be called with the client as an
+        argument.
         '''
 
         while self.running:
             try:
                 data: tuple[bytes, tuple[str, int]] = self._socket.recvfrom(self.BUFFER_SIZE)
+                
+                self._clients_timer[data[1]] = 0
                 if data[1] not in self.clients:
                     self.clients.append(data[1])
 
-                self._clients_timer[data[1]] = 0
+                    if self._func_c:
+                        self._func_c[0](*self._func_c[1], data[1])
 
                 data = (pickle.loads(data[0]), data[1])
 

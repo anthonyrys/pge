@@ -35,14 +35,15 @@ def load_spritesheet(path: str, frames: typing.Optional[typing.Sequence[int]] = 
 
         if scale != 1.0:
             image = pygame.transform.scale(image, (image.get_width() * scale, image.get_height() * scale)).convert_alpha()
-        else:
-            if frames:
-                for _ in range(frames[image_count]):
-                    images.append(image)
-            else:
+            
+        if frames:
+            for _ in range(frames[image_count]):
                 images.append(image)
+        else:
+            images.append(image)
 
         image_count += 1
         start = stop + 1
 
     return images
+    

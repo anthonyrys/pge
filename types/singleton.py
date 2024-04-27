@@ -15,15 +15,17 @@ class Singleton(typing.Generic[T]):
         self._decorated: T = decorated
         self._instance: T = None
 
-    def __call__(self, *args: typing.Sequence[any]) -> T:
+    def __call__(self, *args: typing.Sequence[any], **kwargs: dict[str, any]) -> T:
         '''
         First call, it creates a new instance of the decorated class 
-        and calls its `__init__` method with a sequence of `args`. 
+        and calls its `__init__` method with a sequence of `args` and
+        `kwargs`. 
+        
         On all subsequent calls, the existing instance is returned.
         '''
 
         if self._instance == None:
-            self._instance = self._decorated(*args)
+            self._instance = self._decorated(*args, **kwargs)
         
         return self._instance
 
