@@ -16,17 +16,6 @@ class Particle(Sprite):
     '''
 
     @dataclasses.dataclass
-    class PointPresets:
-        '''
-        Data class for point presets.
-        '''
-
-        SQUARE: ParticlePoints = ([-1, -1], [-1, 1], [1, 1], [1, -1])
-        DIAMOND: ParticlePoints = ([0, -1], [1, 0], [0, 1], [-1, 0])
-
-        NONE: ParticlePoints = ([0, 0], [0, 0], [0, 0], [0, 0])
-
-    @dataclasses.dataclass
     class ParticleInfo:
         '''
         Data class for holding particle information.
@@ -47,6 +36,8 @@ class Particle(Sprite):
 
         color: typing.Optional[tuple[int, int, int]] = (255, 255, 255)
         gravity: typing.Optional[float] = 0
+
+        rotation: typing.Optional[float] = 0
 
     def __init__(self, info: ParticleInfo, index: typing.Optional[int] = 0) -> None:
         '''
@@ -78,6 +69,7 @@ class Particle(Sprite):
         self.current_position: pygame.Vector2 = self.info.position.copy()
         self.current_points: ParticlePoints = [[p[0], p[1]] for p in self.info.points]
         self.current_gravity: float = 0
+        self.current_rotation: float = 0
 
         self.core = Core()
 
@@ -91,6 +83,7 @@ class Particle(Sprite):
 
         self.time += 1 * self.core.delta_time
         self.current_gravity += self.info.gravity * self.core.delta_time 
+        self.current_rotation += self.info.rotation * self.core.delta_time
 
         if self.time >= self.info.duration:
             return SpriteList.SPRITELIST_DELETE
@@ -120,10 +113,20 @@ class Particle(Sprite):
 
         self.rect.topleft = self.current_position
 
-    def render(self) -> None:
+    def render(self, surface=None) -> None:
         '''
         Render the particle sprite.
         '''
 
-        points = [[self.current_position.x + p[0], self.current_position.y + p[1]] for p in self.current_points]
-        pygame.gfxdraw.filled_polygon(self.core.screen, points, self.info.color)
+        if not surface:
+            surface = self.core.screen
+
+        if self.current_rotation != 0:
+            points = []
+            for p in self.current_points:
+                point = pygame.Vector2(p).rotate(self.current_rotation)
+                points.append((self.current_position[0] + point[0], self.current_position[1] + point[1]))
+        else:
+            points = [[self.current_position.x + p[0], self.current_position.y + p[1]] for p in self.current_points]
+
+        pygame.gfxdraw.filled_polygon(surface, points, self.info.color)

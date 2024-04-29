@@ -63,7 +63,7 @@ class Client:
         while self._running:
             time.sleep(self.SLEEP_TIME)
 
-            if not self.recv_packet:
+            if self.recv_packet == None:
                 self._socket.sendto(pickle.dumps('CONNECTING'), (self._ip, self._port))
             
             elif self.send_packet:

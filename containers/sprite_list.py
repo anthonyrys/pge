@@ -23,30 +23,33 @@ class SpriteList(list):
 
         return f'{__object} ({__object.__class__.__name__}) not {Sprite.__name__}'
         
-    def update_all(self) -> None:        
+    def update_all(self, *args: typing.Sequence[any]) -> None:        
         '''
         For all sprites in the list, call its `update` function.
+
+        Optionally, can specify arguments which will also be passed.
         '''
 
         return_value: typing.Union[None, str] = None
         del_sprites: list[Sprite] = []
         
         for __object in self:
-            return_value = __object.update()
+            return_value = __object.update(*args)
             if return_value == self.SPRITELIST_DELETE:
                 del_sprites.append(__object)
 
         for __object in del_sprites:
             self.remove(__object)
 
-    def render_all(self) -> None:
+    def render_all(self, *args: typing.Sequence[any]) -> None:
         '''
         For all sprites in the list, call its `render` function.
+
+        Optionally, can specify arguments which will also be passed.
         '''
                 
         for __object in self:
-            __object.render()
-
+            __object.render(*args)
 
     def __init__(self, __iterable: typing.Optional[typing.Sequence[Sprite]] = []) -> None:
         for __object in __iterable:
