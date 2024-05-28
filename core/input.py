@@ -23,29 +23,30 @@ class Input:
             pygame.KEYUP: []
         }
 
-    def _iter_funcs(self, key: int, funcs: dict[callable, FuncInfo]) -> None:
+    def _iter_funcs(self, event: pygame.Event, funcs: dict[callable, FuncInfo]) -> None:
         '''
         Private function for handling the calling of all of the 
         connected `funcs` and removing them if they were disconnected 
         while iterating.
 
         The given function will be called with its given arguments as
-        well as an input key.
+        well as the pygame `event`.
         '''
 
         self._itering = True
 
+        key: int = event.key
         for func, info in funcs.items():
             if isinstance(info[1], typing.Sequence):
                 if key in info[1]:
                     try:
-                        func(*info[0], key)
+                        func(*info[0], event)
                     except TypeError:
                         func(*info[0])    
         
             elif not info[1] or info[1] == key:
                 try:
-                    func(*info[0], key)
+                    func(*info[0], event)
                 except TypeError:
                     func(*info[0])    
 
@@ -71,10 +72,10 @@ class Input:
                 return True
             
             if event.type == pygame.KEYDOWN:
-                self._iter_funcs(event.key, self._keydown_funcs)
+                self._iter_funcs(event, self._keydown_funcs)
 
             if event.type == pygame.KEYUP:
-                self._iter_funcs(event.key, self._keyup_funcs)
+                self._iter_funcs(event, self._keyup_funcs)
 
         self.pressed = pygame.key.get_pressed()
 

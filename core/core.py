@@ -16,6 +16,17 @@ class Core:
     The entrypoint for pge.
     '''
 
+    @Singleton
+    class Services:
+        '''
+        Services container for pge.
+        '''
+        
+        def __init__(self):
+            self.inputs: Input = Input()
+            self.fonts: Font = Font()
+            self.sounds: Sound = Sound()
+
     def __init__(self, title: str, screen_dimensions: tuple[int, int], frame_rate: int,
                  flags: typing.Optional[int] = 0, icon: typing.Optional[str] = None,
                  mouse: typing.Optional[bool] = True, opengl: typing.Optional[bool] = False) -> None:
@@ -57,9 +68,7 @@ class Core:
 
         self.events: list[pygame.Event] = None
         
-        self.input_service: Input = Input()
-        self.font_service: Font = Font()
-        self.sound_service: Sound = Sound()
+        self.services: self.Services = self.Services()
         
     def __del__(self) -> None:
         '''
@@ -80,7 +89,7 @@ class Core:
 
         while not self.quit:
             self.events = pygame.event.get()
-            self.quit = self.input_service._run(self.events)
+            self.quit = self.services.inputs._run(self.events)
             
             self.delta_time = (time.time() - self.last_time) * self.frame_rate
             self.last_time = time.time()

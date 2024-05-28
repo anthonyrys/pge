@@ -29,11 +29,11 @@ class Font:
             for index, key in enumerate(self._FONT_KEYS):
                 self._fonts[name]['letters'][key] = images[index]
 
-    def create(self, font: str, text: str, size: typing.Optional[int] = 1, 
+    def create(self, text: str, font: typing.Optional[str] = 'm3x6', size: typing.Optional[int] = 1, 
                color: typing.Optional[tuple[int, int, int]] = (255, 255, 255)) -> pygame.Surface:
         '''
-        Returns a new font image based on the given `font` and `text`.
-        Can optionally specify a `size` and a `color`.
+        Returns a new font image based on the given `text`.
+        Can optionally specify a different `font`, `size` and `color`.
         '''
 
         surface_size: list[int] = [0, 0]
