@@ -1,5 +1,7 @@
 from pge.types import Singleton
 
+from pge.mgl import MGLRenderer
+
 from pge.core import Input
 from pge.core import Font
 from pge.core import Sound
@@ -54,11 +56,16 @@ class Core:
         self.frame_rate: int = frame_rate
 
         self.mouse: bool = mouse
-        self.opengl: bool = opengl
         self.quit: bool = False
 
         self.screen: pygame.Surface = pygame.display.set_mode(screen_dimensions, flags)
         self.screen_color: tuple[int, int, int] = (0, 0, 0)
+
+        self.opengl: bool = opengl
+        self.mgl: MGLRenderer = None
+
+        if opengl:
+            self.mgl: MGLRenderer = MGLRenderer(screen_dimensions)
 
         self.clock: pygame.Clock = pygame.time.Clock()
 
@@ -84,6 +91,8 @@ class Core:
 
         Polls pygame events, calculates delta time, and maintains frame rate.
 
+        If an opengl context was created, it will call the `MGLRenderer` render function.
+
         In addition, can run a given `func` and it's `args` each loop.
         '''
 
@@ -98,6 +107,9 @@ class Core:
             
             if func:
                 func(*args)
+
+            if self.opengl:
+                self.mgl.render()
 
             pygame.display.flip()
             self.clock.tick(self.frame_rate)
