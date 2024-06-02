@@ -1,5 +1,7 @@
 from pge.types import Singleton
 
+from pge.utils import clamp
+
 from pge.mgl import MGLRenderer
 
 from pge.core import Input
@@ -31,14 +33,16 @@ class Core:
 
     def __init__(self, title: str, screen_dimensions: tuple[int, int], frame_rate: int,
                  flags: typing.Optional[int] = 0, icon: typing.Optional[str] = None,
-                 mouse: typing.Optional[bool] = True, opengl: typing.Optional[bool] = False) -> None:
+                 mouse: typing.Optional[bool] = True, opengl: typing.Optional[bool] = False,
+                 frame_rate_uncapped: typing.Optional[bool] = False, 
+                 delta_time_threshold: typing.Optional[typing.Union[None, float]] = None) -> None:
         '''
         Initializes the pygame library given a `title`, `screen_dimensions`, 
         `frame_rate`.
 
         Optionally, provide any display `flags`, an `icon` image, if the 
-        `mouse` will be visible, or if the screen will be using an `opengl`
-        context.
+        `mouse` will be visible, if the screen will be using an `opengl`
+        context, `frame_rate_uncapped`, or a maximum `delta_time_threshold`.
         '''
 
         pygame.init()
@@ -54,6 +58,7 @@ class Core:
         
         self.screen_dimensions: tuple[int, int] = screen_dimensions
         self.frame_rate: int = frame_rate
+        self.frame_rate_uncapped: bool = frame_rate_uncapped
 
         self.mouse: bool = mouse
         self.quit: bool = False
@@ -71,6 +76,8 @@ class Core:
 
         self.delta_time: float = time.time()
         self.last_time: float = time.time()
+        self.delta_time_threshold: typing.Union[float, None] = delta_time_threshold
+
         self.frame_count: float = 0
 
         self.events: list[pygame.Event] = None
@@ -103,6 +110,9 @@ class Core:
             self.delta_time = (time.time() - self.last_time) * self.frame_rate
             self.last_time = time.time()
 
+            if self.delta_time_threshold:
+                self.delta_time = clamp(self.delta_time, 0, self.delta_time_threshold)
+
             self.frame_count += 1 * self.delta_time
             
             if func:
@@ -112,7 +122,11 @@ class Core:
                 self.mgl.render()
 
             pygame.display.flip()
-            self.clock.tick(self.frame_rate)
+
+            if self.frame_rate_uncapped:
+                self.clock.tick()
+            else:
+                self.clock.tick(self.frame_rate)        
 
         if Client.instanced:
             Client().kill()
