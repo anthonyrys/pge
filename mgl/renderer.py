@@ -101,6 +101,19 @@ class MGLRenderer:
             obj: MGLObject = MGLObject(sequential, program, buffer, None, array)
             mgl.objects[name] = obj
 
+        def uniform(name: str, attribute: str, value: any) -> None:
+            '''
+            Adds a uniform variable to an `MGLObject`.
+
+            Takes the `name` of the object, the `attribute` and as its `value`.
+            '''
+
+            assert MGLRenderer.instanced
+            mgl: MGLRenderer = MGLRenderer()       
+
+            obj: MGLObject = mgl.objects[name]
+            obj.program[attribute] = value
+            
     def __init__(self, screen_dimensions: tuple[int, int]) -> None:
         '''
         Initializes the renderer given `screen_dimensions` 
