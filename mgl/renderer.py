@@ -160,7 +160,7 @@ class MGLRenderer:
         shaders.
         '''
 
-        shaders = {}
+        shaders: dict[str, list[str]] = {}
         for shader in self._shaders:
             shaders[shader] = list(self._shaders[shader].keys())
 
