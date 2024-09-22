@@ -8,8 +8,6 @@ from pge.core import Input
 from pge.core import Font
 from pge.core import Sound
 
-from pge.network import Client
-
 import pygame
 import typing
 import time
@@ -126,7 +124,4 @@ class Core:
             if self.frame_rate_uncapped:
                 self.clock.tick()
             else:
-                self.clock.tick(self.frame_rate)        
-
-        if Client.instanced:
-            Client().kill()
+                self.clock.tick(self.frame_rate)
