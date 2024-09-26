@@ -7,14 +7,10 @@ import os
 
 @Singleton
 class Font:
-    '''
-    Singleton class for handling fonts.
-    '''
-
     _FONT_PATH: typing.Final[str] = os.path.join('pge', '_data', 'fonts')
     _FONT_KEYS: typing.Final[tuple[str]] = tuple(map(str, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!?,.;:\'\"/|\_()[]{}<>@#$%+-*=^&')) 
 
-    def __init__(self) -> None:
+    def __init__(self):
         self._fonts: dict[str, typing.Union[int, dict[chr, pygame.Surface]]] = {
             'm3x6': {
                 'spacing': 2,
@@ -31,10 +27,6 @@ class Font:
 
     def create(self, text: str, font: typing.Optional[str] = 'm3x6', size: typing.Optional[int] = 1, 
                color: typing.Optional[tuple[int, int, int]] = (255, 255, 255)) -> pygame.Surface:
-        '''
-        Returns a new font image based on the given `text`.
-        Can optionally specify a different `font`, `size` and `color`.
-        '''
 
         surface_size: list[int] = [0, 0]
         images: list[pygame.Surface] = []

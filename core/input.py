@@ -7,11 +7,7 @@ FuncInfo = typing.NewType('FuncInfo', tuple[typing.Sequence[any], typing.Union[N
 
 @Singleton
 class Input:
-    '''
-    Singleton class for handling pygame inputs
-    '''
-
-    def __init__(self) -> None:
+    def __init__(self):
         self.pressed: pygame.key.ScancodeWrapper = None
 
         self._keydown_funcs: dict[callable, FuncInfo] = {}
@@ -24,15 +20,6 @@ class Input:
         }
 
     def _iter_funcs(self, event: pygame.Event, funcs: dict[callable, FuncInfo]) -> None:
-        '''
-        Private function for handling the calling of all of the 
-        connected `funcs` and removing them if they were disconnected 
-        while iterating.
-
-        The given function will be called with its given arguments as
-        well as the pygame `event`.
-        '''
-
         self._itering = True
 
         key: int = event.key
@@ -63,10 +50,6 @@ class Input:
         self._del_funcs[pygame.KEYUP].clear()
 
     def _run(self, events: list[pygame.Event]) -> bool:
-        '''
-        Ran every frame, handles all pygame `events`.
-        '''
-
         for event in events:
             if event.type == pygame.QUIT:
                 return True
@@ -83,20 +66,7 @@ class Input:
 
     def connect(self, keys: typing.Union[None, int, typing.Sequence[int]],
                 key_type: int, func: callable, *args: typing.Sequence[any]) -> None:
-        '''
-        Connect a function to the input service.
-
-        Takes a list of pygame `keys` you want the function to be
-        called to (`None` if you want it to be ran regardless of 
-        which input key).
-
-        `key_type` to determine if it should be called on a keydown
-        or keyup. An `AssertionError` will be raised if its not either
-        `pygame.KEYDOWN` or `pygame.KEYUP`.
-
-        The `func` you want to be called and its `args`.
-        '''
-        
+    
         assert key_type == pygame.KEYDOWN or key_type == pygame.KEYUP
 
         if key_type == pygame.KEYDOWN:
@@ -105,15 +75,6 @@ class Input:
             self._keyup_funcs[func] = (args, keys)
 
     def disconnect(self, func: callable, key_type: int) -> None:
-        '''
-        Disconnect a function from the input service.
-
-        Takes the `func` as well as a `key_type`. 
-        
-        An `AssertionError` will be raised if `key_type`
-        is not either `pygame.KEYDOWN` or `pygame.KEYUP`.
-        '''
-                
         assert key_type == pygame.KEYDOWN or key_type == pygame.KEYUP
       
         if key_type == pygame.KEYDOWN:

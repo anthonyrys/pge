@@ -8,27 +8,21 @@ BezierInfo = typing.NewType('BezierInfo', typing.Sequence[typing.Union[tuple[int
 
 @Singleton
 class Bezier:
-    '''
-    Utility class for bezier operations.
-    '''
+    class Presets:
+        @property
+        def SINE() -> BezierInfo:
+            return [[0, 0], [0, 1], [1, 1], [1, 0], 0]
 
-    @dataclasses.dataclass
-    class BezierPresets:
-        '''
-        Data class for Bezier presets.
-        '''
-
-        SINE: BezierInfo = ([0, 0], [0, 1], [1, 1], [1, 0], 0)
-
-        EASE_OUT: BezierInfo = ([0, 0], [1, 0.09], [1, .95], [1, 0], 0)
-        EASE_IN: BezierInfo = ([0, 0], [0, 0.09], [0, .95], [1, 0], 0)
+        @property
+        def EASE_OUT() -> BezierInfo:
+            return [[0, 0], [1, 0.09], [1, .95], [1, 0], 0]
+        
+        @property
+        def EASE_IN() -> BezierInfo:
+            return [[0, 0], [0, 0.09], [0, .95], [1, 0], 0]   
 
     @staticmethod
     def get_bezier_point(t: float, data: BezierInfo) -> float:
-        '''
-        Returns a position of a bezier point given bezier curve `data` and `t` time.
-        '''
-
         p_0: tuple[float, float] = data[0]
         p_1: tuple[float, float] = data[1]
         p_2: tuple[float, float] = data[2]

@@ -1,3 +1,5 @@
+from pge import OPENGL, MOUSE
+
 from pge.types import Singleton
 
 from pge.utils import clamp
@@ -14,67 +16,46 @@ import time
 
 @Singleton
 class Core:
-    '''
-    The entrypoint for pge.
-    '''
-
     @Singleton
     class Services:
-        '''
-        Services container for pge.
-        '''
-        
         def __init__(self):
             self.inputs: Input = Input()
             self.fonts: Font = Font()
             self.sounds: Sound = Sound()
 
     def __init__(self, title: str, screen_dimensions: tuple[int, int], frame_rate: int,
-                 flags: typing.Optional[int] = 0, icon: typing.Optional[str] = None,
-                 mouse: typing.Optional[bool] = True, opengl: typing.Optional[bool] = False,
-                 frame_rate_uncapped: typing.Optional[bool] = False, 
-                 delta_time_threshold: typing.Optional[typing.Union[None, float]] = None) -> None:
-        '''
-        Initializes the pygame library given a `title`, `screen_dimensions`, 
-        `frame_rate`.
+                 pygame_flags: typing.Optional[int] = 0, pge_flags: typing.Optional[int] = 0):
 
-        Optionally, provide any display `flags`, an `icon` image, if the 
-        `mouse` will be visible, if the screen will be using an `opengl`
-        context, `frame_rate_uncapped`, or a maximum `delta_time_threshold`.
-        '''
+        if pge_flags & OPENGL:
+            pygame_flags |= (pygame.OPENGL | pygame.DOUBLEBUF)
 
         pygame.init()
         pygame.mixer.init()
 
         pygame.display.set_caption(title)
-        if icon:
-            pygame.display.set_icon(icon)
-        
-        pygame.mouse.set_visible(mouse)
+        pygame.mouse.set_visible(True if pge_flags & MOUSE else False)
 
         self.title: str = title
         
         self.screen_dimensions: tuple[int, int] = screen_dimensions
         self.frame_rate: int = frame_rate
-        self.frame_rate_uncapped: bool = frame_rate_uncapped
 
-        self.mouse: bool = mouse
         self.quit: bool = False
 
-        self.screen: pygame.Surface = pygame.display.set_mode(screen_dimensions, flags)
+        self.screen: pygame.Surface = pygame.display.set_mode(screen_dimensions, pygame_flags)
         self.screen_color: tuple[int, int, int] = (0, 0, 0)
 
-        self.opengl: bool = opengl
+        self.opengl: bool = True if pge_flags & OPENGL else False
         self.mgl: MGLRenderer = None
 
-        if opengl:
+        if self.opengl:
             self.mgl: MGLRenderer = MGLRenderer(screen_dimensions)
 
         self.clock: pygame.Clock = pygame.time.Clock()
 
         self.delta_time: float = time.time()
         self.last_time: float = time.time()
-        self.delta_time_threshold: typing.Union[float, None] = delta_time_threshold
+        self.delta_time_threshold: typing.Union[float, None] = None
 
         self.frame_count: float = 0
 
@@ -83,24 +64,10 @@ class Core:
         self.services: self.Services = self.Services()
         
     def __del__(self) -> None:
-        '''
-        Deinitializes the pygame modules.
-        '''
-
         pygame.mixer.quit()
         pygame.quit()
 
     def run(self, func: typing.Optional[typing.Callable] = None, *args: typing.Sequence[any]) -> None:
-        '''
-        Run the main loop.
-
-        Polls pygame events, calculates delta time, and maintains frame rate.
-
-        If an opengl context was created, it will call the `MGLRenderer` render function.
-
-        In addition, can run a given `func` and it's `args` each loop.
-        '''
-
         while not self.quit:
             self.events = pygame.event.get()
             self.quit = self.services.inputs._run(self.events)
@@ -121,7 +88,4 @@ class Core:
 
             pygame.display.flip()
 
-            if self.frame_rate_uncapped:
-                self.clock.tick()
-            else:
-                self.clock.tick(self.frame_rate)
+            self.clock.tick(self.frame_rate)

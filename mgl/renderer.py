@@ -10,34 +10,16 @@ import os
 
 @Singleton
 class MGLRenderer:
-    '''
-    Singleton class handling for Moderngl rendering.
-    '''
-
     class Texture:
-        '''
-        Container for `moderngl.Texture` related functions.
-        '''
-
         @staticmethod
-        def create(name: str, sequential: typing.Optional[bool] = False) -> None:
-            '''
-            Creates a `moderngl.Texture` with a given `name`.
-
-            Can optionally specify if it is `sequential`.
-            '''
-
+        def create(name: str) -> None:
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
 
             texture: moderngl.Texture = mgl.context.texture(mgl.screen_dimensions, 4)
 
-            if sequential:
-                texture.filter = (moderngl.LINEAR, moderngl.LINEAR)
-                texture.swizzle = 'RGBA'
-            else:
-                texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
-                texture.swizzle = 'BGRA'
+            texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
+            texture.swizzle = 'BGRA'
 
             mgl.textures[name] = (texture, mgl.t_i)
             mgl.textures[name][0].use(mgl.t_i)
@@ -45,34 +27,22 @@ class MGLRenderer:
             mgl.t_i += 1
 
         @staticmethod
-        def write(name: str, surface: pygame.Surface) -> None:
-            '''
-            Writes to a given texture given a `name` and a pygame `surface`.
-            '''
-                        
+        def write(name: str, surface: pygame.Surface) -> None:       
             assert MGLRenderer.instanced
 
             mgl: MGLRenderer = MGLRenderer()
             mgl.textures[name][0].write(surface.get_view('1'))
 
     class Object:
-        '''
-        Container for `MGLObject` related functions.
-        '''
-
         @staticmethod
-        def create(sequential: bool, name: str, vert: typing.Union[None, str], 
+        def create(name: str, vert: typing.Union[None, str], 
                    frag: typing.Union[None, str], textures: typing.Sequence[str]) -> None:
-            '''
-            Creates a `MGLObject`, must specify if it is `sequential`. 
-            
-            Must also provide a `name`, a `vert` and `frag` shader and a sequence of `textures`.
-
-            If `vert` or `frag` is passed `None`. It will use the default shader.
-            '''
 
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
+
+            if isinstance(textures, str):
+                textures = [textures]
 
             if vert == None:
                 vert = 'default'
@@ -85,10 +55,7 @@ class MGLRenderer:
                 fragment_shader=mgl._shaders['frag'][frag]
             )
 
-            if sequential:
-                buffer: moderngl.Buffer = mgl.buffers[1]
-            else:
-                buffer: moderngl.Buffer = mgl.buffers[0]            
+            buffer: moderngl.Buffer = mgl.buffers[0]            
 
             array: moderngl.VertexArray =  mgl.context.vertex_array(
                 program,
@@ -98,27 +65,18 @@ class MGLRenderer:
             for texture in textures:
                 program[texture] = mgl.textures[texture][1]
 
-            obj: MGLObject = MGLObject(sequential, program, buffer, None, array)
+            obj: MGLObject = MGLObject(program, None, array)
             mgl.objects[name] = obj
 
+        @staticmethod
         def uniform(name: str, attribute: str, value: any) -> None:
-            '''
-            Adds a uniform variable to an `MGLObject`.
-
-            Takes the `name` of the object, the `attribute` and as its `value`.
-            '''
-
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()       
 
             obj: MGLObject = mgl.objects[name]
             obj.program[attribute] = value
             
-    def __init__(self, screen_dimensions: tuple[int, int]) -> None:
-        '''
-        Initializes the renderer given `screen_dimensions` 
-        '''
-
+    def __init__(self, screen_dimensions: tuple[int, int]):
         self.screen_dimensions: tuple[int, int] = screen_dimensions
         self.context: moderngl.Context = moderngl.create_context()
 
@@ -155,32 +113,18 @@ class MGLRenderer:
 
     @property
     def shaders(self) -> dict[str, list[str]]:
-        '''
-        Returns a dictionary of all currently stored vertex and fragment 
-        shaders.
-        '''
-
         shaders: dict[str, list[str]] = {}
         for shader in self._shaders:
             shaders[shader] = list(self._shaders[shader].keys())
 
         return shaders
     
-    def load(self, path) -> None:
-        '''
-        Loads all of the shaders into the shader dictionary given a 
-        `path` to a directory.
-        '''
-                
+    def load(self, path) -> None:     
         for shader in os.listdir(path):
             with open(os.path.join(path, shader), 'r') as s:
                 self._shaders[shader.split('.')[1]][shader.split('.')[0]] = s.read()  
 
     def render(self) -> None:
-        '''
-        Render all of the current `MGLObjects`.
-        '''
-
         objs: list[MGLObject] = list(o for o in self.objects.values())
         for obj in objs:
             obj.render(self.context.screen)

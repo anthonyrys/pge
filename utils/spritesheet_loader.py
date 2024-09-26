@@ -6,12 +6,6 @@ SPRITESHEET_STOP_COLOR: typing.Final[tuple[int, int, int, int]] = (255, 0, 0, 25
 def load_spritesheet(path: str, frames: typing.Optional[typing.Sequence[int]] = None, 
                      colorkey: typing.Optional[tuple[int, int, int]] = (0, 0, 0),
                      scale: typing.Optional[float] = 1.0) -> list[pygame.Surface]:
-    '''
-    Returns a list of sprites from a given image `path`. 
-    
-    Optionally, can specify a sequence of `frames` for animation,
-    `colorkey` or `scale`.
-    '''
 
     images: list[pygame.Surface] = []
     sheet: pygame.Surface = pygame.image.load(path).convert_alpha()
@@ -46,4 +40,3 @@ def load_spritesheet(path: str, frames: typing.Optional[typing.Sequence[int]] = 
         start = stop + 1
 
     return images
-    
