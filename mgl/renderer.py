@@ -81,7 +81,7 @@ class MGLRenderer:
         self.context: moderngl.Context = moderngl.create_context()
 
         self._shaders: dict[str, dict[str, str]] = { 'vert': {}, 'frag': {} }
-        path = os.path.join('pge', '_data', 'shaders')
+        path = os.path.join('pge', '_resources', 'shaders')
         for shader in os.listdir(path):
             with open(os.path.join(path, shader), 'r') as s:
                 self._shaders[shader.split('.')[1]][shader.split('.')[0]] = s.read()  
@@ -119,7 +119,7 @@ class MGLRenderer:
 
         return shaders
     
-    def load(self, path) -> None:     
+    def load(self, path: str) -> None:     
         for shader in os.listdir(path):
             with open(os.path.join(path, shader), 'r') as s:
                 self._shaders[shader.split('.')[1]][shader.split('.')[0]] = s.read()  
