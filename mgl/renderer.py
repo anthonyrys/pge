@@ -12,14 +12,18 @@ import os
 class MGLRenderer:
     class Texture:
         @staticmethod
-        def create(name: str) -> None:
+        def create(name: str, primary: typing.Optional[bool] = True) -> None:
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
 
             texture: moderngl.Texture = mgl.context.texture(mgl.screen_dimensions, 4)
 
-            texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
-            texture.swizzle = 'BGRA'
+            if primary:
+                texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
+                texture.swizzle = 'BGRA'
+            else:
+                texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
+                texture.swizzle = 'RGBA'
 
             mgl.textures[name] = (texture, mgl.t_i)
             mgl.textures[name][0].use(mgl.t_i)
@@ -33,10 +37,23 @@ class MGLRenderer:
             mgl: MGLRenderer = MGLRenderer()
             mgl.textures[name][0].write(surface.get_view('1'))
 
+    class Framebuffer:
+        @staticmethod
+        def create(buffer_name: str, texture_name: str):
+            assert MGLRenderer.instanced
+            mgl: MGLRenderer = MGLRenderer()
+
+            if texture_name not in mgl.textures:
+                mgl.Texture.create(texture_name, primary=False)
+
+            framebuffer: moderngl.Framebuffer = mgl.context.framebuffer(color_attachments=[mgl.textures[texture_name][0]])
+            mgl.framebuffers[buffer_name] = framebuffer
+
     class Object:
         @staticmethod
         def create(name: str, vert: typing.Union[None, str], 
-                   frag: typing.Union[None, str], textures: typing.Sequence[str]) -> None:
+                   frag: typing.Union[None, str], textures: typing.Sequence[str],
+                   framebuffer: typing.Optional[str] = None) -> None:
 
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
@@ -55,7 +72,11 @@ class MGLRenderer:
                 fragment_shader=mgl._shaders['frag'][frag]
             )
 
-            buffer: moderngl.Buffer = mgl.buffers[0]            
+            if framebuffer:
+                buffer: moderngl.Buffer = mgl.buffers[1]
+                framebuffer: moderngl.Framebuffer = mgl.framebuffers[framebuffer]
+            else:
+                buffer: moderngl.Buffer = mgl.buffers[0]        
 
             array: moderngl.VertexArray =  mgl.context.vertex_array(
                 program,
@@ -65,7 +86,7 @@ class MGLRenderer:
             for texture in textures:
                 program[texture] = mgl.textures[texture][1]
 
-            obj: MGLObject = MGLObject(program, None, array)
+            obj: MGLObject = MGLObject(program, array, framebuffer)
             mgl.objects[name] = obj
 
         @staticmethod
@@ -109,6 +130,7 @@ class MGLRenderer:
         self.textures: dict[str, tuple[moderngl.Texture, int]] = {}
         self.t_i: int = 0
 
+        self.framebuffers: dict[str, moderngl.Framebuffer] = {}
         self.objects: dict[str, MGLObject] = {}
 
     @property
