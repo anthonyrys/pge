@@ -12,11 +12,16 @@ import os
 class MGLRenderer:
     class Texture:
         @staticmethod
-        def create(name: str, primary: typing.Optional[bool] = True) -> None:
+        def create(name: str, primary: typing.Optional[bool] = True,
+                   surface: typing.Optional[pygame.Surface] = None) -> None:
+
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
 
-            texture: moderngl.Texture = mgl.context.texture(mgl.screen_dimensions, 4)
+            if surface:
+                texture: moderngl.Texture = mgl.context.texture(surface.get_size(), 4)
+            else:
+                texture: moderngl.Texture = mgl.context.texture(mgl.screen_dimensions, 4)
 
             if primary:
                 texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
@@ -30,6 +35,9 @@ class MGLRenderer:
 
             mgl.t_i += 1
 
+            if surface:
+                mgl.Texture.write(name, surface)
+
         @staticmethod
         def write(name: str, surface: pygame.Surface) -> None:       
             assert MGLRenderer.instanced
@@ -39,7 +47,7 @@ class MGLRenderer:
 
     class Framebuffer:
         @staticmethod
-        def create(buffer_name: str, texture_name: str):
+        def create(buffer_name: str, texture_name: str) -> None:
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
 
