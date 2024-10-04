@@ -13,15 +13,16 @@ class MGLRenderer:
     class Texture:
         @staticmethod
         def create(name: str, primary: typing.Optional[bool] = True,
-                   surface: typing.Optional[pygame.Surface] = None) -> None:
+                   dimensions: typing.Optional[tuple[int, int]] = None,
+                   dtype: typing.Optional[str] = 'f1') -> None:
 
             assert MGLRenderer.instanced
             mgl: MGLRenderer = MGLRenderer()
 
-            if surface:
-                texture: moderngl.Texture = mgl.context.texture(surface.get_size(), 4)
+            if dimensions:
+                texture: moderngl.Texture = mgl.context.texture(dimensions, 4, dtype=dtype)
             else:
-                texture: moderngl.Texture = mgl.context.texture(mgl.screen_dimensions, 4)
+                texture: moderngl.Texture = mgl.context.texture(mgl.screen_dimensions, 4, dtype=dtype)
 
             if primary:
                 texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
@@ -35,15 +36,16 @@ class MGLRenderer:
 
             mgl.t_i += 1
 
-            if surface:
-                mgl.Texture.write(name, surface)
-
         @staticmethod
-        def write(name: str, surface: pygame.Surface) -> None:       
+        def write(name: str, data: any) -> None:       
             assert MGLRenderer.instanced
 
             mgl: MGLRenderer = MGLRenderer()
-            mgl.textures[name][0].write(surface.get_view('1'))
+
+            if isinstance(data, pygame.Surface):
+                mgl.textures[name][0].write(data.get_view('1'))
+            else:
+                mgl.textures[name][0].write(data)
 
     class Framebuffer:
         @staticmethod
