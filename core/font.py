@@ -13,7 +13,7 @@ class Font:
     def __init__(self):
         self._fonts: dict[str, typing.Union[int, dict[chr, pygame.Surface]]] = {
             'm3x6': {
-                'spacing': 2,
+                'spacing': 1,
                 'letters': {}
             } 
         }

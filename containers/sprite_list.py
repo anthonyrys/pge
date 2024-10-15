@@ -6,7 +6,7 @@ class SpriteList(list):
     SPRITELIST_DELETE: typing.Final[str] = 'sl_00'
 
     def _sort_list(self) -> None:
-        self.sort(key = lambda sprite: sprite.index)
+        self.sort(key = lambda sprite: sprite.layer)
 
     def _get_type_error_message(self, __object: any) -> str:
         return f'{__object} ({__object.__class__.__name__}) not {Sprite.__name__}'

@@ -4,7 +4,7 @@ import pygame
 import typing
 
 class Sprite(pygame.sprite.Sprite):
-    def __init__(self, image: typing.Union[pygame.Surface, str], index: typing.Optional[int] = 0, 
+    def __init__(self, image: typing.Union[pygame.Surface, str], layer: typing.Optional[int] = 0, 
                  position: typing.Optional[pygame.Vector2] = pygame.Vector2(0, 0),
                  image_scale: typing.Optional[float] = 1):
 
@@ -21,7 +21,7 @@ class Sprite(pygame.sprite.Sprite):
 
         self.original_image: typing.Final[pygame.Surface] = self.image.copy()
 
-        self.index: int = index
+        self.layer: int = layer
 
         self.rect: pygame.FRect = self.image.get_frect(topleft=position)
         self.original_rect: typing.Final[pygame.FRect] = self.image.get_frect(topleft=position)
